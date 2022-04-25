@@ -51,6 +51,54 @@ namespace Nefarius.DsHidMini.MVVM
             }
         }
 
+        public bool EnableProfiler
+        {
+            get => _device.GetProperty<byte>(DsHidMiniDriver.EnableProfilerProperty) > 0;
+            set
+            {
+                using (var evt = EventWaitHandle.OpenExisting(
+                    $"Global\\DsHidMiniConfigHotReloadEvent{DeviceAddress}"
+                    ))
+                {
+                    _device.SetProperty(DsHidMiniDriver.EnableProfilerProperty, (byte)(value ? 1 : 0));
+
+                    evt.Set();
+                }
+            }
+        }
+
+        public uint AccelXSensitivity
+        {
+            get => _device.GetProperty<uint>(DsHidMiniDriver.AccelXSensitivityProperty);
+            set
+            {
+                using (var evt = EventWaitHandle.OpenExisting(
+                    $"Global\\DsHidMiniConfigHotReloadEvent{DeviceAddress}"
+                    ))
+                {
+                    _device.SetProperty(DsHidMiniDriver.AccelXSensitivityProperty, value);
+
+                    evt.Set();
+                }
+            }
+        }
+
+        public uint AccelYSensitivity
+        {
+            get => _device.GetProperty<uint>(DsHidMiniDriver.AccelYSensitivityProperty);
+            set
+            {
+                using (var evt = EventWaitHandle.OpenExisting(
+                    $"Global\\DsHidMiniConfigHotReloadEvent{DeviceAddress}"
+                    ))
+                {
+                    _device.SetProperty(DsHidMiniDriver.AccelYSensitivityProperty, value);
+
+                    evt.Set();
+                }
+            }
+        }
+
         public bool IsHidModeChangeable =>
             SecurityUtil.IsElevated /*&& HidEmulationMode != DsHidDeviceMode.XInputHIDCompatible*/;
 

@@ -309,6 +309,74 @@ DMF_DsHidMini_Close(
 
 #pragma endregion
 
+#pragma region Accelerometer Specific
+
+//
+// Convert accelerometer values to selected axis
+// SHORT value, value to convert
+// int mode, what operations to apply
+// int sensitivity, sensitivity adjustment value
+// 
+// AccelY converts with wrong tilt for thumb axis so flip, dont break
+// AccelY and X gets sensitivity adjustment then add 127 to represent Thumb axis
+// Check Y is less than 0 if so make sensitivity adjustment on positive value of Y then double to scale properly
+// Check Y is more than 0 if so make sensitivity adjustment on value of Y then double to scale properly
+// 
+//
+USHORT AccelConversion(SHORT value,int mode,int sensitivity)
+{
+	switch (mode) 
+	{
+	case (DsAccelY):
+		value -= value * 2;
+	case (DsAccelX):
+		value = (value * 0XC) / (1000 / sensitivity) + 0X7F;
+		break;
+	case (DsAccelYtoL2):
+	value = (value > 0) ?  0 : (SHORT)abs((value * 0XC) / (1000 / sensitivity) * 2);
+		break;
+	case (DsAccelYtoR2):
+		value = (value < 0) ? 0 : (value * 0XC) / (1000 / sensitivity) * 2;
+		break;
+	default:
+		break;
+	}
+	// Ensure in range when returning
+	return (value < 0) ? 0 : (value = (value > 255) ? 255 : value);
+}
+
+//
+// Switch profiler mode then perform operations
+// takes full inReport and Context currenty
+// Y axis Middle/Level seems to need 0X1FF, any less and the reading is offset towards down
+// X axis Middle/Level is 0X1F7
+// if new L2 or R2 pressure values are above 0 set as engaged 
+//
+
+PDS3_RAW_INPUT_REPORT AccelProfiler(PDS3_RAW_INPUT_REPORT pInReport, PDEVICE_CONTEXT pDevCtx)
+{
+
+	switch (pDevCtx->Configuration.ProfilerMode)
+	{
+	case DsProfileModeb:
+		pInReport->LeftThumbY = (UCHAR)AccelConversion(0X1FF - _byteswap_ushort(pInReport->AccelerometerY), DsAccelY, pDevCtx->Configuration.AccelYSensitivity);
+	case DsProfileModea:
+		pInReport->LeftThumbX = (UCHAR)AccelConversion(0X1F7 - _byteswap_ushort(pInReport->AccelerometerX), DsAccelX, pDevCtx->Configuration.AccelXSensitivity);
+		break;
+	case DsProfileModec:
+		pInReport->LeftThumbX = (UCHAR)AccelConversion(0X1F7 - _byteswap_ushort(pInReport->AccelerometerX), DsAccelX, pDevCtx->Configuration.AccelXSensitivity);
+		pInReport->Pressure.Values.R2 = (UCHAR)AccelConversion(0X1FF - _byteswap_ushort(pInReport->AccelerometerY), DsAccelYtoR2, pDevCtx->Configuration.AccelYSensitivity);
+		if (pInReport->Pressure.Values.R2) { pInReport->Buttons.Individual.R2 = 1; }
+		pInReport->Pressure.Values.L2 = (UCHAR)AccelConversion(0X1FF - _byteswap_ushort(pInReport->AccelerometerY), DsAccelYtoL2, pDevCtx->Configuration.AccelYSensitivity);
+		if (pInReport->Pressure.Values.L2) { pInReport->Buttons.Individual.L2 = 1; }
+	default:
+		break;
+	}
+	return pInReport;
+}
+
+#pragma endregion
+
 #pragma region DMF Virtual HID Mini-specific
 
 NTSTATUS
@@ -1483,6 +1551,42 @@ VOID DsUsb_EvtUsbInterruptPipeReadComplete(
 	{
 		pDevCtx->BatteryStatus = battery;
 	}
+
+	//
+	// Quick profile combo (L1 + (Circle || Cross || Triangle || Square)) detectection
+	//
+	if (pDevCtx->Configuration.EnableProfiler && pInReport->Buttons.Individual.PS)
+	{
+		t1 = &pDevCtx->ProfileSwitcherTimestamp;
+
+		if (pDevCtx->ProfileSwitcherTimestamp.QuadPart == 0)
+		{
+			QueryPerformanceCounter(t1);
+		}
+
+		QueryPerformanceCounter(&t2);
+
+		ms = (t2.QuadPart - t1->QuadPart) / (freq.QuadPart / 1000);
+
+		//
+		// Timeout reached so check if mode change is requested
+		// 
+		if (ms > 1000)
+		{
+			DS_PROFILE_MODE mode = (pInReport->Buttons.Individual.Cross) ? DsProfileModeDefault :
+				(pInReport->Buttons.Individual.Square) ? DsProfileModea :
+				(pInReport->Buttons.Individual.Triangle) ? DsProfileModeb :
+				(pInReport->Buttons.Individual.Circle) ? DsProfileModec : -1;
+			pDevCtx->Configuration.ProfilerMode = ((mode > -1) && (pDevCtx->Configuration.ProfilerMode != mode)) ? mode : pDevCtx->Configuration.ProfilerMode;
+			FuncExitNoReturn(TRACE_DSHIDMINIDRV);
+			return;
+		}		
+	}
+
+	//
+	// If not default profile process accelerometer data for pInReport 
+	//
+	pInReport = (pDevCtx->Configuration.EnableProfiler && (pDevCtx->Configuration.ProfilerMode != DsProfileModeDefault)) ? AccelProfiler(pInReport, pDevCtx) : pInReport;
 	
 	Ds_ProcessHidInputReport(pDevCtx, pInReport);
 
@@ -1797,6 +1901,41 @@ DsBth_HidInterruptReadContinuousRequestCompleted(
 	{
 		pDevCtx->Connection.Bth.IdleDisconnectTimestamp.QuadPart = 0;
 	}
+
+	//
+	// Quick profile combo (L1 + (Circle || Cross || Triangle || Square)) detectection
+	//
+	if (pDevCtx->Configuration.EnableProfiler && pInReport->Buttons.Individual.PS)
+	{
+		t1 = &pDevCtx->ProfileSwitcherTimestamp;
+
+		if (pDevCtx->ProfileSwitcherTimestamp.QuadPart == 0)
+		{
+			QueryPerformanceCounter(t1);
+		}
+
+		QueryPerformanceCounter(&t2);
+
+		ms = (t2.QuadPart - t1->QuadPart) / (freq.QuadPart / 1000);
+
+		//
+		//  Timeout reached so check if mode change is requested
+		// 
+		if (ms > 1000)
+		{
+			DS_PROFILE_MODE mode = (pInReport->Buttons.Individual.Cross) ? DsProfileModeDefault : 
+				(pInReport->Buttons.Individual.Square) ? DsProfileModea : 
+				(pInReport->Buttons.Individual.Triangle) ? DsProfileModeb :
+				(pInReport->Buttons.Individual.Circle) ? DsProfileModec : -1;
+				pDevCtx->Configuration.ProfilerMode = ((mode > -1) && (pDevCtx->Configuration.ProfilerMode != mode)) ? mode : pDevCtx->Configuration.ProfilerMode;
+		}
+		return ContinuousRequestTarget_BufferDisposition_ContinuousRequestTargetAndContinueStreaming;
+	}
+
+	//
+	// If not default profile process accelerometer data for pInReport 
+	//
+	pInReport = (pDevCtx->Configuration.EnableProfiler && (pDevCtx->Configuration.ProfilerMode != DsProfileModeDefault)) ? AccelProfiler(pInReport, pDevCtx) : pInReport;
 
 	Ds_ProcessHidInputReport(pDevCtx, pInReport);
 

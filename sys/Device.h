@@ -238,6 +238,11 @@ typedef struct _DEVICE_CONTEXT
 	// 
 	LARGE_INTEGER BatteryStatusTimestamp;
 
+	//
+	// Timestamp of PS Button hold for profile switching 
+	// 
+	LARGE_INTEGER ProfileSwitcherTimestamp;
+
 	union
 	{
 		//

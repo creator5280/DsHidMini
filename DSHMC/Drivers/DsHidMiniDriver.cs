@@ -64,6 +64,30 @@ namespace Nefarius.DsHidMini.Drivers
                 Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 2,
                 typeof(byte));
 
+        /// <summary>
+        ///     Unified Device Property to set if should use accelerometer profiler.
+        /// </summary>
+        public static DevicePropertyKey EnableProfilerProperty =>
+			CustomDeviceProperty.CreateCustomDeviceProperty(
+				Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 3,
+				typeof(byte));
+
+        /// <summary>
+        ///     Unified Device Property to set accelerometer X axis sensitivity.
+        /// </summary>
+        public static DevicePropertyKey AccelXSensitivityProperty =>
+			CustomDeviceProperty.CreateCustomDeviceProperty(
+				Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 4,
+				typeof(uint));
+
+        /// <summary>
+        ///     Unified Device Property to set accelerometer X axis sensitivity.
+        /// </summary>
+        public static DevicePropertyKey AccelYSensitivityProperty =>
+			CustomDeviceProperty.CreateCustomDeviceProperty(
+				Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 5,
+				typeof(uint));
+
         #endregion
 
         #region Common device properties
