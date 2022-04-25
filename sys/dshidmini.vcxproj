@@ -270,11 +270,15 @@
       <AdditionalIncludeDirectories>$(SolutionDir)include;..\..\DMF\DMF\Modules.Library;..\..\DMF\DMF\Framework;$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions);DMF_USER_MODE</PreprocessorDefinitions>
       <WarningLevel>Level3</WarningLevel>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <AdditionalDependencies>..\..\DMF\Debug\x64\lib\DmfU\DmfU.lib;%(AdditionalDependencies);OneCoreUAP.lib;BluetoothApis.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>libcmtd;%(IgnoreSpecificDefaultLibraries);kernel32.lib;user32.lib</IgnoreSpecificDefaultLibraries>
     </Link>
+    <DriverSign>
+      <FileDigestAlgorithm>SHA256</FileDigestAlgorithm>
+    </DriverSign>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
