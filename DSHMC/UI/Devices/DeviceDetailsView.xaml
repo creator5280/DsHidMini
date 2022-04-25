@@ -713,6 +713,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
@@ -899,6 +900,35 @@
                                     </ToolTip.Template>
                                 </ToolTip>
                             </DockPanel.ToolTip>
+                        </DockPanel>
+                        <DockPanel Grid.Row="4" LastChildFill="False">
+                            <DockPanel.ToolTip>
+                                <ToolTip controlzex:ToolTipAssist.AutoMove="True">
+                                    <ToolTip.Template>
+                                        <ControlTemplate>
+                                            <Grid>
+                                                <Border Background="Gray"
+                                                BorderBrush="Black"
+                                                BorderThickness="1"
+                                                Opacity="0.9"
+                                                SnapsToDevicePixels="True" />
+                                                <StackPanel>
+                                                    <TextBlock Margin="{adonisUi:Space 1}"
+                                                    Foreground="WhiteSmoke"
+                                                    FontSize="16"
+                                                    FontWeight="Bold"
+                                                    Text="Blocks PS button for XInput to bypass Xbox game bar etc"
+                                                    TextOptions.TextFormattingMode="Display"
+                                                    TextOptions.TextRenderingMode="ClearType" />                                                    
+                                                </StackPanel>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </ToolTip.Template>
+                                </ToolTip>
+                            </DockPanel.ToolTip>
+                            <CheckBox Margin="{adonisUi:Space 1}"
+                            IsEnabled="{Binding Path=IsElevated}"
+                            IsChecked="{Binding SelectedDevice.BlockPs}" Content="Block PS button on XInput"/>
                         </DockPanel>
                     </Grid>
                 </GroupBox>

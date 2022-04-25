@@ -1587,6 +1587,12 @@ VOID DsUsb_EvtUsbInterruptPipeReadComplete(
 	// If not default profile process accelerometer data for pInReport 
 	//
 	pInReport = (pDevCtx->Configuration.EnableProfiler && (pDevCtx->Configuration.ProfilerMode != DsProfileModeDefault)) ? AccelProfiler(pInReport, pDevCtx) : pInReport;
+
+	//
+	// Should Block PS Button.
+	// Stops Xbox game bar on XInput
+	// 
+	pInReport->Buttons.Individual.PS = (pDevCtx->Configuration.BlockPs) ? 0 : pInReport->Buttons.Individual.PS;
 	
 	Ds_ProcessHidInputReport(pDevCtx, pInReport);
 
@@ -1936,6 +1942,12 @@ DsBth_HidInterruptReadContinuousRequestCompleted(
 	// If not default profile process accelerometer data for pInReport 
 	//
 	pInReport = (pDevCtx->Configuration.EnableProfiler && (pDevCtx->Configuration.ProfilerMode != DsProfileModeDefault)) ? AccelProfiler(pInReport, pDevCtx) : pInReport;
+
+	//
+	// Should Block PS Button.
+	// Stops Xbox game bar on XInput
+	// 
+	pInReport->Buttons.Individual.PS = (pDevCtx->Configuration.BlockPs) ? 0 : pInReport->Buttons.Individual.PS;
 
 	Ds_ProcessHidInputReport(pDevCtx, pInReport);
 

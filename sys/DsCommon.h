@@ -183,6 +183,9 @@ typedef struct _DS_DRIVER_CONFIGURATION
     /** True to mute digital pressure buttons */
     BOOLEAN MuteDigitalPressureButtons;
 
+    /** Should block Ps Button*/
+    BOOLEAN BlockPs;
+
 	/** UNUSED */
 	BOOLEAN DisableAutoPairing;
 

@@ -99,6 +99,22 @@ namespace Nefarius.DsHidMini.MVVM
             }
         }
 
+        public bool BlockPs
+        {
+            get => _device.GetProperty<byte>(DsHidMiniDriver.BlockPsButtonProperty) > 0;
+            set
+            {
+                using (var evt = EventWaitHandle.OpenExisting(
+                    $"Global\\DsHidMiniConfigHotReloadEvent{DeviceAddress}"
+                    ))
+                {
+                    _device.SetProperty(DsHidMiniDriver.BlockPsButtonProperty, (byte)(value ? 1 : 0));
+
+                    evt.Set();
+                }
+            }
+        }
+
         public bool IsHidModeChangeable =>
             SecurityUtil.IsElevated /*&& HidEmulationMode != DsHidDeviceMode.XInputHIDCompatible*/;
 

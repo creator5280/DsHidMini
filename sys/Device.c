@@ -459,6 +459,17 @@ VOID DsDevice_HotReloadConfiguration(PDEVICE_CONTEXT Context)
 		&requiredSize,
 		&propType
 	);
+
+	WDF_DEVICE_PROPERTY_DATA_INIT(&propData, &DEVPKEY_DsHidMini_HR_BlockPsButton);
+
+	(void)WdfDeviceQueryPropertyEx(
+		device,
+		&propData,
+		sizeof(UCHAR),
+		&Context->Configuration.BlockPs,
+		&requiredSize,
+		&propType
+	);
 }
 
 //

@@ -88,6 +88,14 @@ namespace Nefarius.DsHidMini.Drivers
 				Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 5,
 				typeof(uint));
 
+        /// <summary>
+        ///     Unified Device Property to block PS button.
+        /// </summary>
+        public static DevicePropertyKey BlockPsButtonProperty =>
+			CustomDeviceProperty.CreateCustomDeviceProperty(
+				Guid.Parse("{99ACCB6C-D709-49BB-90EE-278B1B564A4B}"), 6,
+				typeof(byte));
+
         #endregion
 
         #region Common device properties

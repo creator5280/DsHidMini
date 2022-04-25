@@ -85,4 +85,8 @@ DEFINE_DEVPROPKEY(DEVPKEY_DsHidMini_HR_AccelXSensitivity,
 DEFINE_DEVPROPKEY(DEVPKEY_DsHidMini_HR_AccelYSensitivity,
 	0x99accb6c, 0xd709, 0x49bb, 0x90, 0xee, 0x27, 0x8b, 0x1b, 0x56, 0x4a, 0x4b, 5); // DEVPROP_TYPE_UINT32
 
+// {99ACCB6C-D709-49BB-90EE-278B1B564A4B}
+DEFINE_DEVPROPKEY(DEVPKEY_DsHidMini_HR_BlockPsButton,
+	0x99accb6c, 0xd709, 0x49bb, 0x90, 0xee, 0x27, 0x8b, 0x1b, 0x56, 0x4a, 0x4b, 6); // DEVPROP_TYPE_BYTE
+
 #pragma endregion
