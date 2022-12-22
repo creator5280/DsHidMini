@@ -137,15 +137,54 @@ typedef enum _DS_OUTPUT_REPORT_SOURCE
 #include <pshpack1.h>
 
 //
+//  
+//
+typedef enum _DS_PROFILE_MODE
+{
+    DsProfileModeDefault = 0x00,
+    DsProfileModea = 0x01,
+    DsProfileModeb = 0x02,
+    DsProfileModec = 0x03
+
+} DS_PROFILE_MODE, * PDS_PROFILE_MODE;
+
+//
+//  
+//
+typedef enum _DS_ACCEL_AXIS
+{
+    DsAccelX = 0x00,
+    DsAccelY = 0x01,
+    DsAccelYtoL2 = 0x02,
+    DsAccelYtoR2 = 0x03
+
+} DS_ACCEL_AXIS, * PDS_ACCEL_AXIS;
+
+//
 // Per device dynamic configuration properties
 // 
 typedef struct _DS_DRIVER_CONFIGURATION
 {
     /** The HID device mode */
     DS_HID_DEVICE_MODE HidDeviceMode;
+
+    /** Which profile mode to use */
+    DS_PROFILE_MODE ProfilerMode;
+
+    /** Is profiler mode on */
+    BOOLEAN EnableProfiler;
+
+    /** Accelerometer X axis sensitivity increase in percent */
+    ULONG AccelXSensitivity;
+
+    /** Accelerometer Y axis ensitivity increase in percent */
+    ULONG AccelYSensitivity;
 	
     /** True to mute digital pressure buttons */
     BOOLEAN MuteDigitalPressureButtons;
+
+    /** Should block Ps Button*/
+    BOOLEAN BlockPs;
 
 	/** UNUSED */
 	BOOLEAN DisableAutoPairing;

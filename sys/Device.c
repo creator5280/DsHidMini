@@ -426,6 +426,50 @@ VOID DsDevice_HotReloadConfiguration(PDEVICE_CONTEXT Context)
 		&requiredSize,
 		&propType
 	);
+
+	WDF_DEVICE_PROPERTY_DATA_INIT(&propData, &DEVPKEY_DsHidMini_HR_EnableProfiler);
+
+	(void)WdfDeviceQueryPropertyEx(
+		device,
+		&propData,
+		sizeof(UCHAR),
+		&Context->Configuration.EnableProfiler,
+		&requiredSize,
+		&propType
+	);
+
+	WDF_DEVICE_PROPERTY_DATA_INIT(&propData, &DEVPKEY_DsHidMini_HR_AccelXSensitivity);
+
+	(void)WdfDeviceQueryPropertyEx(
+		device,
+		&propData,
+		sizeof(ULONG),
+		&Context->Configuration.AccelXSensitivity,
+		&requiredSize,
+		&propType
+	);
+
+	WDF_DEVICE_PROPERTY_DATA_INIT(&propData, &DEVPKEY_DsHidMini_HR_AccelYSensitivity);
+
+	(void)WdfDeviceQueryPropertyEx(
+		device,
+		&propData,
+		sizeof(ULONG),
+		&Context->Configuration.AccelYSensitivity,
+		&requiredSize,
+		&propType
+	);
+
+	WDF_DEVICE_PROPERTY_DATA_INIT(&propData, &DEVPKEY_DsHidMini_HR_BlockPsButton);
+
+	(void)WdfDeviceQueryPropertyEx(
+		device,
+		&propData,
+		sizeof(UCHAR),
+		&Context->Configuration.BlockPs,
+		&requiredSize,
+		&propType
+	);
 }
 
 //
